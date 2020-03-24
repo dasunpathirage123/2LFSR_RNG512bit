@@ -106,7 +106,7 @@ module rng512LFSR2
    
           STATE_2    : begin
             if(r_LFSR>18'd100000 )begin
-              pq_fifo_dout <= (r_LFSR*17'd65537)+1'd1; //random number reletivly prime to e value 65537  
+              pq_fifo_dout <= (r_LFSR*17'd65537)+2'd2; //random number reletivly prime to e value 65537  
             end
             
             //odd check

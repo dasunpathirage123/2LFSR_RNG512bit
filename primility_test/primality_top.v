@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module primality_test 
+module primality_top 
   #(
     parameter NUM_BITS = 128
    )(
@@ -11,8 +11,8 @@ module primality_test
    output reg[NUM_BITS-1:0]  prime_out,
 				
    output reg				 pq_fifo_rd_en,
-   input[NUM_BITS-1:0]	 pq_fifo_din,
-   input				 pq_fifo_empty
+   input[NUM_BITS-1:0]	 pq_fifo_din
+   //input				 pq_fifo_empty
    );
 
     localparam      STATE_INIT  = 0;
@@ -41,10 +41,13 @@ wire [NUM_BITS-1:0]     m_value;
 wire 					m_valid; 
 reg  [NUM_BITS-1:0]     m;
 reg  [32:0] 			security_value;
+
+wire pq_fifo_empty;
+
 //---------------------------------------------------------------------------------------------------------------------
 // Implementation
 //---------------------------------------------------------------------------------------------------------------------
-
+assign pq_fifo_empty = 1'b0;
 
 always @(posedge aclk ) begin 
 	if(!aresetn) begin
@@ -91,6 +94,7 @@ always @(posedge aclk ) begin
 		 			state <= LOOP;
 		 		end
 		 	end
+		 	//$urandom_range(,)
 
 		 	LOOP			: begin
 		 		if (m == p_value - 128'b1) begin
@@ -127,7 +131,7 @@ always @(posedge aclk ) begin
 		 	SET_P			: begin
 		 		pq_fifo_rd_en <= 1'b1;
 		 		p_valid 	  <= 1'b1;
-		 		p_value 	  <= pq_fifo_din;//$urandom_range(2,1000);//pq_fifo_din
+		 		p_value 	  <= $urandom_range(2,1000);//pq_fifo_din;
 		 	end
 
 		 	GET_M			: begin
@@ -166,7 +170,7 @@ always @(posedge aclk ) begin
 		 		if (security_value != 32'd0 && !pq_fifo_empty) begin
 		 			pq_fifo_rd_en <= 1'b1;
 			 		a_valid		  <= 1'b1;
-			 		a_value		  <= (pq_fifo_din%(p_value));//$urandom_range(1,p_value);//(pq_fifo_din%(p_value-2) + 2);
+			 		a_value		  <= $urandom_range(2,p_value);//pq_fifo_din%(p_value-2) + 2;
 		 		end
 		 		
 		 	end
